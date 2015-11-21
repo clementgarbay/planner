@@ -56,7 +56,7 @@ public class CommonTimeSlot extends TimeSlot implements Comparable {
     @Deprecated
     private void computeImpossibilityFactor() {
         // If the common time slot contains a compulsory person and his total unavailability factor is equals to 0 then make a "simple" calculation
-        boolean simple = this.persons.stream().filter(p -> p.getTotalUnavailabilityFactor() == 0 && p.isCompulsory()).toArray().length > 0;
+        boolean simple = this.persons.stream().filter(p -> p.getTotalUnavailabilityFactor() == 0 && p.isCompulsory()).count() > 0;
 
         // Increment the global impossibility factor with the total unavailability factor of each persons, weighted with the obligation of the persons
         for (CommonTimeSlotPerson commonTimeSlotPerson: this.persons) {
@@ -94,6 +94,14 @@ public class CommonTimeSlot extends TimeSlot implements Comparable {
         return this.impossibilityFactor;
     }
 
+    /**
+     * Check if there are conflicts between persons in this common time slots.
+     * @return  true if two or more persons are in conflict, false otherwise
+     */
+    public boolean hasConflicts() {
+        return this.getImpossibilityFactor() > 0;
+    }
+
     @Override
     public int compareTo(Object o) {
         if (!(o instanceof TimeSlot)) throw new IllegalArgumentException();
@@ -105,7 +113,7 @@ public class CommonTimeSlot extends TimeSlot implements Comparable {
     public String toString() {
         return  "[start: " + this.getTimeStart() +
                 " - end: " + this.getTimeEnd() +
-                " , impossibilityFactor : " + this.getImpossibilityFactor() +
+                " , conflicts : " + this.hasConflicts() +
                 " , details : " + this.getPersons() +
                 "] \n";
     }
